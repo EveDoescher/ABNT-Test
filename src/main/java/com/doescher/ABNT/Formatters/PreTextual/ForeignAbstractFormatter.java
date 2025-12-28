@@ -5,12 +5,16 @@ import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
+@Component
+@Order(5)
 public class ForeignAbstractFormatter implements ComponentFormatter {
 
     @Override
     public boolean shouldRender(Document data){
-        return true;
+        return data.getForeignAbstractContent() != null && !data.getForeignAbstractContent().isEmpty();
     }
 
     @Override

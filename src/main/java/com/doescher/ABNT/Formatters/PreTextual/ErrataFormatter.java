@@ -5,9 +5,13 @@ import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
+@Order(3)
 public class ErrataFormatter implements ComponentFormatter {
 
     @Override

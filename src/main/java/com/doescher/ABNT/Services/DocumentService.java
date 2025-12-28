@@ -1,57 +1,51 @@
 package com.doescher.ABNT.Services;
 
 import com.doescher.ABNT.Domain.Models.Document;
+import com.doescher.ABNT.Domain.Repositories.DocumentRepository;
 import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
-import com.doescher.ABNT.Formatters.PostTextual.ReferenceFormatter;
-import com.doescher.ABNT.Formatters.PreTextual.*;
-import com.doescher.ABNT.Formatters.Textual.SectionFormatter;
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class DocumentService {
 
-    private final WordEngine engine;
+    private final DocumentRepository repository;
+    private final WordEngine wordEngine;
+    private final List<ComponentFormatter> formatters;
 
-    private final List<ComponentFormatter> pipeline = List.of(
-            new CoverFormatter(),
-            new TitlePageFormatter(),
-            new ErrataFormatter(),
-            new AbstractFormatter(),
-            new ForeignAbstractFormatter(),
-            new SummaryFormatter(),
-            new SectionFormatter(),
-            new ReferenceFormatter()
-    );
+    public DocumentService(DocumentRepository repository, WordEngine wordEngine, List<ComponentFormatter> formatters) {
+        this.repository = repository;
+        this.wordEngine = wordEngine;
+        this.formatters = formatters;
+    }
 
-    public byte[] generateWord(Document document) throws IOException{
-        InputStream inputStream = getClass().getResourceAsStream("/templates/template.docx");
+    public Document save(Document document){
+        return repository.save(document);
+    }
 
-        XWPFDocument doc;
-        if (inputStream != null){
-            doc = new XWPFDocument(inputStream);
-        }else {
-            doc = new XWPFDocument();
-        }
+    public byte[] generateWordDocument(Long id) throws IOException{
+        Document document = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Não foi encontrado documento com id: " + id));
 
-        try (doc){
-            for (ComponentFormatter formatter : pipeline){
+        try (XWPFDocument wordDoc = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()){
+            for (ComponentFormatter formatter : formatters){
                 if (formatter.shouldRender(document)){
-                    formatter.format(doc, document, engine);
+                    formatter.format(wordDoc, document, wordEngine);
                 }
             }
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            doc.write(out);
+            wordDoc.write(out);
             return out.toByteArray();
         }
+    }
+
+    public Document findById(Long id){
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Não foi encontrado documento com id: " + id));
     }
 }

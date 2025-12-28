@@ -7,9 +7,13 @@ import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
+@Order(2)
 public class TitlePageFormatter implements ComponentFormatter {
 
     @Override

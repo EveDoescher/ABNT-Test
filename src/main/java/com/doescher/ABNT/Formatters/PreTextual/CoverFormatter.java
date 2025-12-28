@@ -5,14 +5,18 @@ import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
+@Order(1)
 public class CoverFormatter implements ComponentFormatter {
 
     @Override
     public boolean shouldRender(Document data){
-        return true;
+        return data.getTitle() != null;
     }
 
     @Override

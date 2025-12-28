@@ -5,12 +5,16 @@ import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
+@Component
+@Order(4)
 public class AbstractFormatter implements ComponentFormatter {
 
     @Override
     public boolean shouldRender(Document data){
-        return true;
+        return data.getAbstractContent() != null && !data.getAbstractContent().isEmpty();
     }
 
     @Override

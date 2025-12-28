@@ -5,16 +5,20 @@ import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Component
+@Order(8)
 public class ReferenceFormatter implements ComponentFormatter {
 
     @Override
     public boolean shouldRender(Document data) {
-        return true;
+        return data.getReferences() != null && !data.getReferences().isEmpty();
     }
 
     @Override

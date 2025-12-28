@@ -5,15 +5,19 @@ import com.doescher.ABNT.Domain.Models.Section;
 import com.doescher.ABNT.Engine.WordEngine;
 import com.doescher.ABNT.Formatters.ComponentFormatter;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
 
+@Component
+@Order(7)
 public class SectionFormatter implements ComponentFormatter {
 
     @Override
     public boolean shouldRender(Document data){
-        return true;
+        return data.getSections() != null && !data.getSections().isEmpty();
     }
 
     @Override
