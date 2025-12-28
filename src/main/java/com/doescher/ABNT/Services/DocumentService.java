@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -32,14 +33,30 @@ public class DocumentService {
         Document document = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Não foi encontrado documento com id: " + id));
 
-        try (XWPFDocument wordDoc = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()){
-            for (ComponentFormatter formatter : formatters){
-                if (formatter.shouldRender(document)){
-                    formatter.format(wordDoc, document, wordEngine);
-                }
+        try (InputStream templateStream = getClass().getResourceAsStream("/templates/template.docx");
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+            XWPFDocument wordDoc;
+
+            if (templateStream != null) {
+                wordDoc = new XWPFDocument(templateStream);
+            } else {
+                System.out.println("Template não encontrado! Criando documento em branco.");
+                wordDoc = new XWPFDocument();
+                wordEngine.setupAbntPage(wordDoc);
             }
 
-            wordDoc.write(out);
+
+            try (wordDoc) {
+                for (ComponentFormatter formatter : formatters) {
+                    if (formatter.shouldRender(document)) {
+                        formatter.format(wordDoc, document, wordEngine);
+                    }
+                }
+
+                wordDoc.write(out);
+            }
+
             return out.toByteArray();
         }
     }

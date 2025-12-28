@@ -5,6 +5,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -172,6 +173,33 @@ public class WordEngine {
         }
 
         breakLines(doc, 2);
+    }
+
+    public void setupAbntPage(XWPFDocument doc) {
+        // Garante que existe o corpo do documento
+        if (doc.getDocument().getBody() == null) {
+            doc.getDocument().addNewBody();
+        }
+
+        CTSectPr sectPr = doc.getDocument().getBody().isSetSectPr() ?
+                doc.getDocument().getBody().getSectPr() :
+                doc.getDocument().getBody().addNewSectPr();
+
+        // 1. Configurar Tamanho do Papel (A4)
+        // Largura: 11906 twips (~21cm), Altura: 16838 twips (~29.7cm)
+        CTPageSz pageSize = sectPr.isSetPgSz() ? sectPr.getPgSz() : sectPr.addNewPgSz();
+        pageSize.setW(BigInteger.valueOf(11906));
+        pageSize.setH(BigInteger.valueOf(16838));
+
+        // 2. Configurar Margens ABNT (Sup/Esq: 3cm, Inf/Dir: 2cm)
+        // 1cm = 567 twips
+        // 3cm = 1701 twips
+        // 2cm = 1134 twips
+        CTPageMar pageMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
+        pageMar.setTop(BigInteger.valueOf(1701));    // 3cm
+        pageMar.setLeft(BigInteger.valueOf(1701));   // 3cm
+        pageMar.setBottom(BigInteger.valueOf(1134)); // 2cm
+        pageMar.setRight(BigInteger.valueOf(1134));  // 2cm
     }
 
 }

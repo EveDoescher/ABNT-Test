@@ -22,9 +22,6 @@ public class SummaryFormatter implements ComponentFormatter {
         doc.createParagraph().setPageBreak(true);
         String font = data.getFontType();
 
-        engine.addParagraph(doc, "SUMÁRIO", true, ParagraphAlignment.CENTER, 0, font);
-        engine.breakLines(doc, 1);
-
         engine.addTOC(doc, data.getFontType());
 
         engine.enforceUpdate(doc);
