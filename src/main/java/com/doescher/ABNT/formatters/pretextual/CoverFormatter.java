@@ -1,8 +1,10 @@
 package com.doescher.ABNT.formatters.pretextual;
 
-import com.doescher.ABNT.models.entities.Document;
+import com.doescher.ABNT.constants.AbntConstants;
 import com.doescher.ABNT.helpers.WordHelper;
+import com.doescher.ABNT.models.entities.Document;
 import com.doescher.ABNT.formatters.ComponentFormatter;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.core.annotation.Order;
@@ -12,7 +14,10 @@ import java.time.LocalDate;
 
 @Component
 @Order(1)
+@RequiredArgsConstructor
 public class CoverFormatter implements ComponentFormatter {
+
+    private final WordHelper wordHelper;
 
     @Override
     public boolean shouldRender(Document data){
@@ -20,8 +25,8 @@ public class CoverFormatter implements ComponentFormatter {
     }
 
     @Override
-    public void format(XWPFDocument doc, Document data, WordHelper engine){
-        String font = data.getFontType();
+    public void format(XWPFDocument doc, Document data){
+        String font = data.getFontType().getFamilyName();
 
         int textLines = 2;
         if (data.getCourse() != null) textLines++;
@@ -32,25 +37,25 @@ public class CoverFormatter implements ComponentFormatter {
         int gap = Math.max((30 - textLines) / 3,1);
 
         //ELEMENTOS DA CAPA
-        engine.addParagraph(doc, data.getInstitution().toUpperCase(), true, ParagraphAlignment.CENTER, 0, font);
+        wordHelper.addParagraph(doc, data.getInstitution().toUpperCase(), true, ParagraphAlignment.CENTER, 0, font);
         if (data.getCourse() != null){
-            engine.addParagraph(doc, data.getCourse().toUpperCase(), true, ParagraphAlignment.CENTER, 0, font);
+            wordHelper.addParagraph(doc, data.getCourse().toUpperCase(), true, ParagraphAlignment.CENTER, 0, font);
         }
 
-        engine.breakLines(doc, gap);
+        wordHelper.breakLines(doc, gap);
 
-        data.getAuthors().forEach(a -> engine.addParagraph(doc, a.toUpperCase(), false, ParagraphAlignment.CENTER, 0, font));
+        data.getAuthors().forEach(a -> wordHelper.addParagraph(doc, a.toUpperCase(), false, ParagraphAlignment.CENTER, 0, font));
 
-        engine.breakLines(doc, gap);
+        wordHelper.breakLines(doc, gap);
 
-        engine.addParagraph(doc, data.getTitle().toUpperCase(), true, ParagraphAlignment.CENTER, 0, font);
+        wordHelper.addParagraph(doc, data.getTitle().toUpperCase(), true, ParagraphAlignment.CENTER, 0, font);
         if (data.getSubtitle() != null){
-            engine.addParagraph(doc, data.getSubtitle().toUpperCase(), false, ParagraphAlignment.CENTER, 0, font);
+            wordHelper.addParagraph(doc, data.getSubtitle().toUpperCase(), false, ParagraphAlignment.CENTER, 0, font);
         }
 
-        engine.breakLines(doc, gap);
+        wordHelper.breakLines(doc, gap);
 
-        engine.addParagraph(doc, data.getCity().toUpperCase(), false, ParagraphAlignment.CENTER, 0, font);
-        engine.addParagraph(doc, String.valueOf(LocalDate.now().getYear()), false, ParagraphAlignment.CENTER, 0, font);
+        wordHelper.addParagraph(doc, data.getCity().toUpperCase(), false, ParagraphAlignment.CENTER, 0, font);
+        wordHelper.addParagraph(doc, String.valueOf(LocalDate.now().getYear()), false, ParagraphAlignment.CENTER, 0, font);
     }
 }

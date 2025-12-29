@@ -1,4 +1,4 @@
-package com.doescher.ABNT.models.dto;
+package com.doescher.ABNT.models.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

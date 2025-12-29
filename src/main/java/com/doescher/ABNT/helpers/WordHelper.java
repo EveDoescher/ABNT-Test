@@ -1,5 +1,6 @@
 package com.doescher.ABNT.helpers;
 
+import com.doescher.ABNT.constants.AbntConstants;
 import com.doescher.ABNT.models.entities.ErrataItem;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
@@ -18,23 +19,23 @@ public class WordHelper {
         XWPFParagraph paragraph = doc.createParagraph();
         paragraph.setAlignment(align);
         paragraph.setSpacingAfter(spacingAfter);
-        paragraph.setSpacingBefore(0);
-        paragraph.setSpacingBetween(1.5, LineSpacingRule.AUTO);
+        paragraph.setSpacingBefore(AbntConstants.NO_SPACING);
+        paragraph.setSpacingBetween(AbntConstants.LINE_SPACING, LineSpacingRule.AUTO);
 
         XWPFRun run = paragraph.createRun();
         run.setText(text);
         run.setBold(bold);
         run.setFontFamily(fontFamily);
-        run.setFontSize(12);
+        run.setFontSize(AbntConstants.FONT_SIZE_TEXT);
     }
 
     //Metodo para pular linhas
     public void breakLines(XWPFDocument doc, int qnt){
         for (int i = 0; i < qnt; i++){
             XWPFParagraph paragraph = doc.createParagraph();
-            paragraph.setSpacingAfter(0);
-            paragraph.setSpacingBefore(0);
-            paragraph.setSpacingBetween(1.5, LineSpacingRule.AUTO);
+            paragraph.setSpacingAfter(AbntConstants.NO_SPACING);
+            paragraph.setSpacingBefore(AbntConstants.NO_SPACING);
+            paragraph.setSpacingBetween(AbntConstants.LINE_SPACING, LineSpacingRule.AUTO);
         }
     }
 
@@ -59,9 +60,9 @@ public class WordHelper {
         for (String line : content.split("\n")){
             XWPFParagraph paragraph = doc.createParagraph();
             paragraph.setAlignment(ParagraphAlignment.BOTH);
-            paragraph.setSpacingAfter(0);
-            paragraph.setSpacingBetween(1.5, LineSpacingRule.AUTO);
-            paragraph.setIndentationFirstLine(709); //1.25cm
+            paragraph.setSpacingAfter(AbntConstants.NO_SPACING);
+            paragraph.setSpacingBetween(AbntConstants.LINE_SPACING, LineSpacingRule.AUTO);
+            paragraph.setIndentationFirstLine(AbntConstants.INDENTATION_FIRST_LINE); //1.25cm
 
             XWPFRun run = paragraph.createRun();
             run.setText(line.trim());
@@ -76,18 +77,18 @@ public class WordHelper {
 
         XWPFParagraph paragraph = doc.createParagraph();
         paragraph.setAlignment(ParagraphAlignment.BOTH);
-        paragraph.setSpacingBetween(1.5, LineSpacingRule.AUTO);
+        paragraph.setSpacingBetween(AbntConstants.LINE_SPACING, LineSpacingRule.AUTO);
         paragraph.setIndentationFirstLine(0);
 
         XWPFRun run = paragraph.createRun();
         run.setText(content);
         run.setFontFamily(fontFamily);
-        run.setFontSize(12);
+        run.setFontSize(AbntConstants.FONT_SIZE_TEXT);
     }
 
     //Metodo para configurar a criação do sumario
     public void addTOC(XWPFDocument doc, String fontFamily){
-        addParagraph(doc, "SUMÁRIO", true, ParagraphAlignment.CENTER, 0, fontFamily);
+        addParagraph(doc, AbntConstants.LABEL_SUMMARY, true, ParagraphAlignment.CENTER, 0, fontFamily);
         breakLines(doc, 1);
 
         XWPFParagraph paragraph = doc.createParagraph();
@@ -118,19 +119,35 @@ public class WordHelper {
 
     }
 
+    //Metodo para adicionar/formatar textos com recuo a esquerda
+    public void addRightAlignedText(XWPFDocument doc, String text, String fontFamily,int identation, boolean italic) {
+        if (text == null || text.isEmpty()) return;
+
+        XWPFParagraph paragraph = doc.createParagraph();
+        paragraph.setAlignment(ParagraphAlignment.BOTH);
+
+        paragraph.setIndentationLeft(identation);
+
+        XWPFRun run = paragraph.createRun();
+        run.setText(text);
+        run.setFontFamily(fontFamily);
+        run.setFontSize(AbntConstants.FONT_SIZE_TEXT);
+        run.setItalic(italic);
+    }
+
     //Metodo para adicionar/Formatar titulos pós textuais
     public void addPostTextualTitle(XWPFDocument doc, String text, String fontFamily) {
         XWPFParagraph paragraph = doc.createParagraph();
 
         paragraph.setStyle("Heading1");
         paragraph.setAlignment(ParagraphAlignment.CENTER);
-        paragraph.setSpacingAfter(240);
+        breakLines(doc, 1);
 
         XWPFRun run = paragraph.createRun();
         run.setText(text.toUpperCase());
         run.setBold(true);
         run.setFontFamily(fontFamily);
-        run.setFontSize(12);
+        run.setFontSize(AbntConstants.FONT_SIZE_TEXT);
     }
 
     //Metodo para adicionar/formatar texto de referencia
@@ -139,16 +156,16 @@ public class WordHelper {
 
         XWPFParagraph paragraph = doc.createParagraph();
         paragraph.setAlignment(ParagraphAlignment.LEFT);
-        paragraph.setSpacingBetween(1.0);
-        paragraph.setSpacingAfter(240);
+        paragraph.setSpacingBetween(AbntConstants.SIMPLE_LINE_SPACING);
+        breakLines(doc, 1);
 
-        paragraph.setIndentationFirstLine(0);
-        paragraph.setIndentationLeft(0);
+        paragraph.setIndentationFirstLine(AbntConstants.NO_INDENTATION_FIRST_LINE);
+        paragraph.setIndentationLeft(AbntConstants.NO_INDENTATION);
 
         XWPFRun run = paragraph.createRun();
         run.setText(text);
         run.setFontFamily(fontFamily);
-        run.setFontSize(12);
+        run.setFontSize(AbntConstants.FONT_SIZE_TITLE);
     }
 
     //Metodo para adicionar a tabela de errata
@@ -156,23 +173,57 @@ public class WordHelper {
         if (items == null || items.isEmpty()) return;
 
         XWPFTable table = doc.createTable();
-        table.setWidth("100%");
+        table.setWidth(AbntConstants.TABLE_WIDTH_FULL);
+
+        XWPFTable.XWPFBorderType type = XWPFTable.XWPFBorderType.SINGLE;
+
+        table.setTopBorder(type, AbntConstants.BORDER_SIZE, AbntConstants.BORDER_SPACE, AbntConstants.BORDER_COLOR);
+        table.setBottomBorder(type, AbntConstants.BORDER_SIZE, AbntConstants.BORDER_SPACE, AbntConstants.BORDER_COLOR);
+        table.setLeftBorder(type, AbntConstants.BORDER_SIZE, AbntConstants.BORDER_SPACE, AbntConstants.BORDER_COLOR);
+        table.setRightBorder(type, AbntConstants.BORDER_SIZE, AbntConstants.BORDER_SPACE, AbntConstants.BORDER_COLOR);
+        table.setInsideHBorder(type, AbntConstants.BORDER_SIZE, AbntConstants.BORDER_SPACE, AbntConstants.BORDER_COLOR);
+        table.setInsideVBorder(type, AbntConstants.BORDER_SIZE, AbntConstants.BORDER_SPACE, AbntConstants.BORDER_COLOR);
 
         XWPFTableRow header = table.getRow(0);
-        header.getCell(0).setText("Folha");
-        header.addNewTableCell().setText("Linha");
-        header.addNewTableCell().setText("Onde se lê");
-        header.addNewTableCell().setText("Leia-se");
+        styleCell(header.getCell(0), "Folha", true, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_SMALL);
+        styleCell(header.addNewTableCell(), "Linha", true, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_SMALL);
+        styleCell(header.addNewTableCell(), "Onde se lê", true, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_LARGE);
+        styleCell(header.addNewTableCell(), "Leia-se", true, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_LARGE);
 
         for (var item : items){
             XWPFTableRow row = table.createRow();
-            row.getCell(0).setText(String.valueOf(item.getPage()));
-            row.getCell(1).setText(String.valueOf(item.getLine()));
-            row.getCell(2).setText(item.getTextFrom());
-            row.getCell(3).setText(item.getTextTo());
+            styleCell(row.getCell(0), String.valueOf(item.getPage()), false, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_SMALL);
+            styleCell(row.getCell(1), String.valueOf(item.getLine()), false, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_SMALL);
+            styleCell(row.getCell(2), item.getTextFrom(), false, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_LARGE);
+            styleCell(row.getCell(3), item.getTextTo(), false, fontFamily, ParagraphAlignment.CENTER, AbntConstants.TABLE_CELL_WIDTH_LARGE);
         }
 
         breakLines(doc, 2);
+    }
+
+    //Metodo auxiliar do addErrataTable para formatar celulas
+    private void styleCell(XWPFTableCell cell, String text, boolean bold, String fontFamily, ParagraphAlignment align, int width){
+        if (cell.getParagraphs().size() > 0){
+            for (int i = 0; i < cell.getParagraphs().size(); i++){
+                cell.removeParagraph(0);
+            }
+        }
+
+        if (width > 0){
+            cell.setWidth(String.valueOf(width));
+        }
+
+        cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
+        XWPFParagraph paragraph = cell.addParagraph();
+        paragraph.setAlignment(align);
+        paragraph.setSpacingAfter(AbntConstants.NO_SPACING);
+        paragraph.setSpacingBefore(AbntConstants.NO_SPACING);
+
+        XWPFRun run = paragraph.createRun();
+        run.setText(text);
+        run.setBold(bold);
+        run.setFontFamily(fontFamily);
+        run.setFontSize(AbntConstants.FONT_SIZE_SMALL);
     }
 
     public void setupAbntPage(XWPFDocument doc) {
@@ -185,21 +236,17 @@ public class WordHelper {
                 doc.getDocument().getBody().getSectPr() :
                 doc.getDocument().getBody().addNewSectPr();
 
-        // 1. Configurar Tamanho do Papel (A4)
-        // Largura: 11906 twips (~21cm), Altura: 16838 twips (~29.7cm)
+        //Configurar Tamanho do Papel (A4)
         CTPageSz pageSize = sectPr.isSetPgSz() ? sectPr.getPgSz() : sectPr.addNewPgSz();
-        pageSize.setW(BigInteger.valueOf(11906));
-        pageSize.setH(BigInteger.valueOf(16838));
+        pageSize.setW(BigInteger.valueOf(AbntConstants.PAGE_WIDTH));
+        pageSize.setH(BigInteger.valueOf(AbntConstants.PAGE_HEIGHT));
 
-        // 2. Configurar Margens ABNT (Sup/Esq: 3cm, Inf/Dir: 2cm)
-        // 1cm = 567 twips
-        // 3cm = 1701 twips
-        // 2cm = 1134 twips
+        //Configurar Margens ABNT
         CTPageMar pageMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
-        pageMar.setTop(BigInteger.valueOf(1701));    // 3cm
-        pageMar.setLeft(BigInteger.valueOf(1701));   // 3cm
-        pageMar.setBottom(BigInteger.valueOf(1134)); // 2cm
-        pageMar.setRight(BigInteger.valueOf(1134));  // 2cm
+        pageMar.setTop(BigInteger.valueOf(AbntConstants.MARGIN_TOP));
+        pageMar.setLeft(BigInteger.valueOf(AbntConstants.MARGIN_LEFT));
+        pageMar.setBottom(BigInteger.valueOf(AbntConstants.MARGIN_BOTTOM));
+        pageMar.setRight(BigInteger.valueOf(AbntConstants.MARGIN_RIGHT));
     }
 
 }

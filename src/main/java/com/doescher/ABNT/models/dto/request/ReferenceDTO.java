@@ -1,4 +1,4 @@
-package com.doescher.ABNT.models.dto;
+package com.doescher.ABNT.models.dto.request;
 
 import java.util.List;
 

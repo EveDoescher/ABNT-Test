@@ -1,8 +1,10 @@
 package com.doescher.ABNT.formatters.pretextual;
 
-import com.doescher.ABNT.models.entities.Document;
+import com.doescher.ABNT.constants.AbntConstants;
 import com.doescher.ABNT.helpers.WordHelper;
+import com.doescher.ABNT.models.entities.Document;
 import com.doescher.ABNT.formatters.ComponentFormatter;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.core.annotation.Order;
@@ -12,7 +14,10 @@ import java.time.LocalDate;
 
 @Component
 @Order(3)
+@RequiredArgsConstructor
 public class ErrataFormatter implements ComponentFormatter {
+
+    private final WordHelper wordHelper;
 
     @Override
     public boolean shouldRender(Document data){
@@ -20,19 +25,19 @@ public class ErrataFormatter implements ComponentFormatter {
     }
 
     @Override
-    public void format(XWPFDocument doc, Document data, WordHelper engine){
-        String font = data.getFontType();
+    public void format(XWPFDocument doc, Document data){
+        String font = data.getFontType().getFamilyName();
         doc.createParagraph().setPageBreak(true);
 
-        engine.addParagraph(doc, "ERRATA", true, ParagraphAlignment.CENTER, 0, font);
-        engine.breakLines(doc, 2);
+        wordHelper.addParagraph(doc, AbntConstants.LABEL_ERRATA, true, ParagraphAlignment.CENTER, 0, font);
+        wordHelper.breakLines(doc, 2);
 
         String reference = data.getAuthors().get(0).toUpperCase() + ". " + data.getTitle() + ". " + String.valueOf(LocalDate.now().getYear() + ".");
 
-        engine.addBodyText(doc, reference, font);
-        engine.breakLines(doc, 2);
+        wordHelper.addBodyText(doc, reference, font);
+        wordHelper.breakLines(doc, 2);
 
-        engine.addErrataTable(doc, data.getErrata(), font);
+        wordHelper.addErrataTable(doc, data.getErrata(), font);
 
     }
 }

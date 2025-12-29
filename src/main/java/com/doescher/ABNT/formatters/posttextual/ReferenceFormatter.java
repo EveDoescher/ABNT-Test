@@ -1,8 +1,10 @@
 package com.doescher.ABNT.formatters.posttextual;
 
-import com.doescher.ABNT.models.entities.Document;
+import com.doescher.ABNT.constants.AbntConstants;
 import com.doescher.ABNT.helpers.WordHelper;
+import com.doescher.ABNT.models.entities.Document;
 import com.doescher.ABNT.formatters.ComponentFormatter;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -11,8 +13,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-@Order(8)
+@Order(11)
+@RequiredArgsConstructor
 public class ReferenceFormatter implements ComponentFormatter {
+
+    private final WordHelper wordHelper;
 
     @Override
     public boolean shouldRender(Document data) {
@@ -20,18 +25,18 @@ public class ReferenceFormatter implements ComponentFormatter {
     }
 
     @Override
-    public void format(XWPFDocument doc, Document data, WordHelper engine){
-        String font = data.getFontType();
+    public void format(XWPFDocument doc, Document data){
+        String font = data.getFontType().getFamilyName();
 
         doc.createParagraph().setPageBreak(true);
 
-        engine.addPostTextualTitle(doc, "REFERÊNCIAS", font);
+        wordHelper.addPostTextualTitle(doc, AbntConstants.LABEL_REFERENCES, font);
 
         List<String> sortedRefs = data.getReferences();
         Collections.sort(sortedRefs);
 
         for (String ref : sortedRefs){
-            engine.addReferenceText(doc, ref, font);
+            wordHelper.addReferenceText(doc, ref, font);
         }
     }
 }
